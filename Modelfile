@@ -1,0 +1,6 @@
+FROM phi3.5:mini-instruct
+ADAPTER ./lora_out
+PARAMETER num_ctx 4096
+PARAMETER temperature 0
+PARAMETER num_predict 128
+
