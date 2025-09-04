@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ethereum Wallet Transaction Classifier</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 2rem; }
+    input, button { padding: 0.5rem; font-size: 1rem; }
+    #results { margin-top: 1.5rem; }
+    .tx { margin: 0.5rem 0; padding: 0.5rem; border-bottom: 1px solid #ddd; }
+    .hash { font-family: monospace; font-size: 0.9rem; }
+    .category { font-weight: bold; color: #2c3e50; }
+  </style>
+</head>
+<body>
+  <h1>Ethereum Wallet Transaction Classifier</h1>
+  <input id="addr" type="text" placeholder="Paste Ethereum address" size="50" />
+  <button onclick="analyze()">Analyze Transactions</button>
+  <div id="results"></div>
+
+  <script>
+    async function analyze() {
+      const addr = document.getElementById("addr").value.trim();
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "Loading...";
+
+      try {
+        const r = await fetch(`/api/analyze?address=${addr}&limit=10`);
+        if (!r.ok) {
+          const err = await r.text();
+          resultsDiv.innerHTML = `Error: Server responded ${r.status}: ${err}`;
+          return;
+        }
+        const data = await r.json();
+        resultsDiv.innerHTML = `<h3>Results for ${data.address}</h3>`;
+        data.transactions.forEach(tx => {
+          const div = document.createElement("div");
+          div.className = "tx";
+          div.innerHTML = `<div class="hash">${tx.hash}</div><div class="category">${tx.category}</div>`;
+          resultsDiv.appendChild(div);
+        });
+      } catch (e) {
+        resultsDiv.innerHTML = "Error: " + e.message;
+      }
+    }
+  </script>
+</body>
+</html>
